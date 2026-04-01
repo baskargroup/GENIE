@@ -1,0 +1,5 @@
+{
+  "name": "Gram-Eigen SIREN Editor",
+  "description": "Interactive tool for editing SIREN model weights using Gram-eigen basis coefficients and interpolation.",
+  "requestFramePermissions": []
+}

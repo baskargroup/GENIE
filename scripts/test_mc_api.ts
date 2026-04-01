@@ -1,0 +1,10 @@
+import * as mc from 'marching-cubes-fast';
+const mod:any = mc as any;
+const fn = mod.marchingCubes || mod.default?.marchingCubes;
+const RES=64;
+const bounds = [[-1,-1,-1],[1,1,1]];
+const potential = (x:number,y:number,z:number) => Math.sqrt(x*x+y*y+z*z)-0.6;
+const mesh = fn(RES, potential, bounds, false);
+console.log('keys', Object.keys(mesh));
+console.log('verts', mesh.vertices?.length, 'faces', mesh.faces?.length);
+console.log('vert0', mesh.vertices?.[0], 'face0', mesh.faces?.[0]);
