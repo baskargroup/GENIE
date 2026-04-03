@@ -231,10 +231,6 @@ export default function App() {
     pointLight2.position.set(-5, -5, 5);
     scene.add(pointLight2);
 
-    const grid = new THREE.GridHelper(2, 20, 0xcbd5e1, 0xe2e8f0);
-    grid.position.y = -1;
-    scene.add(grid);
-
     sceneRef.current = { scene, camera, renderer, controls, mesh: null };
 
     const animate = () => {
@@ -353,6 +349,18 @@ export default function App() {
           </div>
 
           <div className="pt-6">
+            <div className="mx-auto mb-6 max-w-3xl rounded-3xl border border-zinc-200 bg-white/85 p-6 text-left shadow-sm backdrop-blur-sm">
+              <div className="space-y-3 text-sm leading-7 text-zinc-700 md:text-base">
+                <p>
+                  GENIE enables instant geometry editing of implicit neural representations (INRs) by solving a
+                  closed-form linear system instead of retraining networks.
+                </p>
+                <p>
+                  It uses Gram eigenmodes of feature space to characterize editable directions, making edits fast,
+                  stable, and controllable.
+                </p>
+              </div>
+            </div>
             <div className="mb-6 flex items-center justify-center gap-8 text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em]">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
@@ -466,92 +474,80 @@ export default function App() {
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-2">
                 <Settings2 className="w-3 h-3" />
-                Global Parameters
+                Interpolation
               </h2>
             </div>
 
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-zinc-600">Interpolation (t)</span>
-                  <span className="text-indigo-600 font-mono font-medium">{t.toFixed(3)}</span>
+            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm">
+              <div className="mb-4 flex items-end justify-between gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-zinc-700">Interpolation (t)</div>
+                  <div className="text-[11px] uppercase tracking-[0.2em] text-zinc-500">Source to target</div>
                 </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.001"
-                  value={t}
-                  onChange={(e) => setT(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 bg-zinc-200 h-1 rounded-full appearance-none cursor-pointer hover:bg-zinc-300 transition-colors"
-                />
+                <div className="text-3xl font-mono font-semibold tracking-tight text-indigo-700">{t.toFixed(3)}</div>
               </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-[11px]">
-                  <span className="text-zinc-600">Bias Offset (db)</span>
-                  <span className="text-indigo-600 font-mono font-medium">{db.toFixed(3)}</span>
-                </div>
-                <input
-                  type="range"
-                  min="-0.5"
-                  max="0.5"
-                  step="0.001"
-                  value={db}
-                  onChange={(e) => setDb(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-600 bg-zinc-200 h-1 rounded-full appearance-none cursor-pointer hover:bg-zinc-300 transition-colors"
-                />
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.001"
+                value={t}
+                onChange={(e) => setT(parseFloat(e.target.value))}
+                className="w-full accent-indigo-600 bg-zinc-200 h-2 rounded-full appearance-none cursor-pointer hover:bg-zinc-300 transition-colors"
+              />
+              <div className="mt-2 flex justify-between text-[11px] text-zinc-500">
+                <span>0.000</span>
+                <span>1.000</span>
               </div>
             </div>
           </section>
 
           <section className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-2">
-                <Layers className="w-3 h-3" />
-                Eigen Coefficients (d)
-              </h2>
               <button
-                onClick={() => setD(new Array(activeK).fill(0))}
-                className="text-[10px] text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1"
+                onClick={() => setShowBasis(!showBasis)}
+                className="text-xs font-bold uppercase tracking-widest text-indigo-400 hover:text-indigo-500 transition-colors flex items-center gap-2"
               >
-                <RefreshCw className="w-2.5 h-2.5" />
-                Reset
+                <Layers className="w-3 h-3" />
+                More
+                {showBasis ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
               </button>
+              {showBasis ? (
+                <button
+                  onClick={() => setD(new Array(activeK).fill(0))}
+                  className="text-[10px] text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-1"
+                >
+                  <RefreshCw className="w-2.5 h-2.5" />
+                  Reset
+                </button>
+              ) : null}
             </div>
 
-            <div className="space-y-4">
-              {(showBasis ? d : d.slice(0, 8)).map((val, i) => (
-                <div key={i} className="space-y-1.5 group">
-                  <div className="flex justify-between text-[10px]">
-                    <span className="text-zinc-500 font-mono group-hover:text-zinc-700 transition-colors">λ_{i + 1}</span>
-                    <span className="text-indigo-700 font-mono">{val.toFixed(3)}</span>
+            {showBasis ? (
+              <div className="space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-4">
+                {d.map((val, i) => (
+                  <div key={i} className="space-y-1.5 group">
+                    <div className="flex justify-between text-[10px]">
+                      <span className="text-zinc-500 font-mono group-hover:text-zinc-700 transition-colors">λ_{i + 1}</span>
+                      <span className="text-indigo-700 font-mono">{val.toFixed(3)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-0.02"
+                      max="0.02"
+                      step="0.001"
+                      value={val}
+                      onChange={(e) => {
+                        const newD = [...d];
+                        newD[i] = parseFloat(e.target.value);
+                        setD(newD);
+                      }}
+                      className="w-full accent-indigo-600 bg-zinc-200 h-1 rounded-full appearance-none cursor-pointer hover:bg-zinc-300 transition-colors"
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min="-1"
-                    max="1"
-                    step="0.01"
-                    value={val}
-                    onChange={(e) => {
-                      const newD = [...d];
-                      newD[i] = parseFloat(e.target.value);
-                      setD(newD);
-                    }}
-                    className="w-full accent-indigo-600 bg-zinc-200 h-1 rounded-full appearance-none cursor-pointer hover:bg-zinc-300 transition-colors"
-                  />
-                </div>
-              ))}
-              <div className="pt-2 text-center">
-                <button
-                  onClick={() => setShowBasis(!showBasis)}
-                  className="text-[10px] text-zinc-500 hover:text-zinc-700 transition-colors flex items-center gap-1 mx-auto"
-                >
-                  {showBasis ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-                  {showBasis ? 'Show less' : `Show all ${activeK} coefficients`}
-                </button>
+                ))}
               </div>
-            </div>
+            ) : null}
           </section>
         </div>
 
